@@ -86,6 +86,10 @@ void backtrack(int S[], int N){
 					k+=1;
 				}
 			}
+
+
+
+
 			printf("\nS = {");
 			for(i=0; i<N; i++){
 				if(i == N-1){
@@ -171,7 +175,6 @@ int main(){
 			ptr = strtok(NULL, " ");
 			n++;
 		}
-
     	backtrack(S, n);
 		printf("\n");
 	}
