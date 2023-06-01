@@ -1,2 +1,2 @@
 make:
-	gcc main.c && ./a.out
+	gcc partition_problem.c && ./a.out
