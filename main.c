@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #define MAX_LINE_LENGTH 1000
 
 int factorial(int n){
@@ -43,18 +44,20 @@ void backtrack(int S[], int N){
 		colSize += (factorial(N))/(factorial(i)*factorial(N-i));
 	}
 	
-	int array[colSize+2][N+2]; //array to be used in storing all possible combinations
-	int S1[colSize+2][N+2];
-	int S2[colSize+2][N+2];
+	int array[colSize][N]; //array to be used in storing all possible combinations
+	int S1[colSize][N];
+	int S2[colSize][N];
 
 	
 	int index1 = 0;
 	int index2 = 0;
 
 	//initialize all the elements of the array to 0 so that there will be no garbage value
-	for(i=1; i<=colSize; i++){
-		for (int j=1; j<=N; j++){
+	for(i=0; i<colSize; i++){
+		for (j=0; j<N; j++){
 			array[i][j] = 0;
+			S1[i][j] = 0;
+			S2[i][j] = 0;
 		}
 	}
 	
@@ -101,6 +104,10 @@ void backtrack(int S[], int N){
 			}
 
 			printf("Partitionings (%d solutions):\n", numberOfSolutions/2);
+
+			if(numberOfSolutions==0){
+				printf("There are no solutions\n");
+			}
 
 			for(i=0; i<numberOfSolutions/2; i++){
 				printf("{");
@@ -163,6 +170,14 @@ int main(){
 	int S[99];
 	char line[MAX_LINE_LENGTH];
 
+	double t;
+	time_t t1, t2;
+	//clock_t t1,t2;
+	
+	/* START CLOCK*/
+	// time(&t1); 			//time_t
+			//clock_t
+
 	FILE *fp;
 	fp = fopen("input.txt", "r");
 	
@@ -170,7 +185,9 @@ int main(){
 	numOfSets = atoi(line);
 
 	for(i=0; i<numOfSets;i++){
+		t1 = clock();
 		n=0;
+
 		fgets(line, MAX_LINE_LENGTH, fp);
 
 		char *ptr = strtok(line, " ");
@@ -179,9 +196,23 @@ int main(){
 			ptr = strtok(NULL, " ");
 			n++;
 		}
+
+		
+
     	backtrack(S, n);
 		printf("\n");
+		t2 = clock();		//clock_t
+		t = (double) (t2-t1)/ (double)CLOCKS_PER_SEC;
+		printf("\nTime elapsed: %0.6f\n", t);
+		
 	}
 
+	/* STOP CLOCK*/
+	// time(&t2);			//time_t
+	// t = difftime(t2,t1);
+
+	
+	
+	
 	return 0;
 }

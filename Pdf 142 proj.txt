@@ -1,0 +1,5 @@
+1. To accommodate the Partition Problem with the backtracking algorithm. We took all the outputted unique combinations from the backtracking algorithm, compared it with the original array to check for the elements that it did not contain to create the other set, and checked if their sums were the same. If they were, they were added to the solution set. Not much was touched in the actual backtracking algorithm, except for the capability to save the set of combinations.
+
+2. It is similar to the Subset Sum problem in concept. Both problems tackle the issue of summations of a set but in different ways. The subset sum looks for a subset that equals a specified sum, while the partition problem, finds a way to split a set into two sets with an equal sum. The way we implemented the partition problem, it can also be used for the subset sum, but the same cannot be said for the dynamic programming implementation used for the subset sum towards the partition problem.
+
+3. 
