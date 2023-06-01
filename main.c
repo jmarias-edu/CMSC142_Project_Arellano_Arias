@@ -17,6 +17,17 @@ int factorial(int n){
 	return fact;
 }
 
+int checkInArray(int x, int size,int S[]){
+	for(int i=0; i<size; i++){
+		if(x==S[i]) return 1;
+	}
+	return 0;
+}
+
+int checkDuplicate(){
+	return 0;
+}
+
 void backtrack(int S[], int N){
 	int nopts[N+2]; //array of top of stacks
 	int option[N+2][N+2]; //array of stacks of options
@@ -36,6 +47,10 @@ void backtrack(int S[], int N){
 	int S1[colSize+2][N+2];
 	int S2[colSize+2][N+2];
 
+	
+	int index1 = 0;
+	int index2 = 0;
+
 	//initialize all the elements of the array to 0 so that there will be no garbage value
 	for(i=1; i<=colSize; i++){
 		for (int j=1; j<=N; j++){
@@ -50,45 +65,33 @@ void backtrack(int S[], int N){
 		if(nopts[start] <= 0){ //pag nakuha na lahat ng combination
 			numberOfSolutions = 0;
 
-			for(i=1; i<=colSize; i++){
-				k=i;
-				while(k < colSize){
-					sum = 0;
-					sum1 = 0;
-					numberOfNonZero = 0;
-					numberOfNonZero1 = 0;
-					for (j=1; j<=N; j++){
-						if(array[i][j] != 0) numberOfNonZero++;
-						if(array[k+1][j] != 0) numberOfNonZero1++;
-						sum += array[i][j];
-						sum1 += array[k+1][j];
-					}
+			for(i=0; i<colSize; i++){
 
-					int invalid = 0;
-					if(sum == sum1 && (numberOfNonZero+numberOfNonZero1)==N){
-						for (j=1; j<=N; j++){
-							for (int l=1; l<=N; l++){
-								if(array[i][j] == array[k+1][l] && array[i][j] != 0){
-									invalid = 1;
-									break;
-								}
-							}
-							if(invalid) break;
-						}
-						if(!invalid){
-							for (j=1; j<=N; j++){
-								S1[numberOfSolutions][j] = array[i][j];
-								S2[numberOfSolutions][j] = array[k+1][j];
-							}
-							numberOfSolutions++;
-						} 
+				sum = 0;
+				sum1 = 0;
+
+				for(j=0; j<N; j++){
+					// printf("S[j]: %d\n", S[j]);
+					if(checkInArray(S[j],N,array[i])) sum += S[j];
+					else sum1 += S[j];
+				}
+				
+				// printf("sum: %d\n", sum);
+				// printf("sum1: %d\n", sum1);
+
+				if(sum == sum1){
+					// printf("EQUAL!\n");
+					
+					index1 = 0;
+					index2 = 0;
+
+					for (j=0; j<N; j++){
+						if(checkInArray(S[j],N,array[i])) S1[numberOfSolutions][index1++] = S[j];
+						else S2[numberOfSolutions][index2++] = S[j];
 					}
-					k+=1;
+					numberOfSolutions++;
 				}
 			}
-
-
-
 
 			printf("\nS = {");
 			for(i=0; i<N; i++){
@@ -97,12 +100,12 @@ void backtrack(int S[], int N){
 				}else printf("%d, ", S[i]);	
 			}
 
-			printf("Partitionings (%d solutions):\n", numberOfSolutions);
+			printf("Partitionings (%d solutions):\n", numberOfSolutions/2);
 
-			for(i=0; i<numberOfSolutions; i++){
+			for(i=0; i<numberOfSolutions/2; i++){
 				printf("{");
-				for(j=1; j<N; j++){
-					if(S1[i][j+1] == 0){ 
+				for(j=0; j<N; j++){
+					if(S1[i][j+1]==0){ 
 						printf("%d}", S1[i][j]);
 						break;
 					}
@@ -110,8 +113,9 @@ void backtrack(int S[], int N){
 				}
 				
 				printf("  {");
-				for(j=1; j<N; j++){
-					if(S2[i][j+1] == 0){ 
+
+				for(j=0; j<N; j++){
+					if(S2[i][j+1]==0){ 
 						printf("%d}\n", S2[i][j]);
 						break;
 					}
@@ -156,7 +160,7 @@ void backtrack(int S[], int N){
 int main(){
 	int numOfSets, n, i, j;
 	int numOfSetsC = 0;
-	int S[10];
+	int S[99];
 	char line[MAX_LINE_LENGTH];
 
 	FILE *fp;
