@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#define MAX_LINE_LENGTH 1000
 
-int factorial (int n){
+int factorial(int n){
 	unsigned long long fact = 1;
     int i;
 
@@ -15,29 +17,28 @@ int factorial (int n){
 	return fact;
 }
 
-void backtrack(int N){
-	int start, move;
+void backtrack(int S[], int N){
 	int nopts[N+2]; //array of top of stacks
 	int option[N+2][N+2]; //array of stacks of options
-	int i, candidate;
-	
+	int start, move;
+	int i, j, k;
+	int candidate, sum, sum1, numberOfNonZero,numberOfNonZero1;
+	int numberOfSolutions = 0;
 	int counter = 1;
-	int S[] = {13, 17, 12, 8, 14, 6, 20, 10};
-	int arr_size = sizeof(S)/sizeof(S[0]);
-	int x = 0;
+	int colSize = 0;
 
 	//get total number of sets of combinations 
-	for(i=1; i<=arr_size;i++){
-		x += (factorial(arr_size))/(factorial(i)*factorial(arr_size-i));
+	for(i=1; i<=N;i++){
+		colSize += (factorial(N))/(factorial(i)*factorial(N-i));
 	}
 	
-	int array[x+2][arr_size+2]; //array to be used in storing all possible combinations
-	int S1[x+2][arr_size+2];
-	int S2[x+2][arr_size+2];
+	int array[colSize+2][N+2]; //array to be used in storing all possible combinations
+	int S1[colSize+2][N+2];
+	int S2[colSize+2][N+2];
 
 	//initialize all the elements of the array to 0 so that there will be no garbage value
-	for(i=1; i<=x; i++){
-		for (int j=1; j<=arr_size; j++){
+	for(i=1; i<=colSize; i++){
+		for (int j=1; j<=N; j++){
 			array[i][j] = 0;
 		}
 	}
@@ -45,7 +46,77 @@ void backtrack(int N){
 	move = start = 0; 
 	nopts[start]= 1;
 	
-	while (nopts[start]>0) { //while dummy stack is not empty 
+	while(1) { //while dummy stack is not empty 
+		if(nopts[start] <= 0){ //pag nakuha na lahat ng combination
+			numberOfSolutions = 0;
+
+			for(i=1; i<=colSize; i++){
+				k=i;
+				while(k < colSize){
+					sum = 0;
+					sum1 = 0;
+					numberOfNonZero = 0;
+					numberOfNonZero1 = 0;
+					for (j=1; j<=N; j++){
+						if(array[i][j] != 0) numberOfNonZero++;
+						if(array[k+1][j] != 0) numberOfNonZero1++;
+						sum += array[i][j];
+						sum1 += array[k+1][j];
+					}
+
+					int invalid = 0;
+					if(sum == sum1 && (numberOfNonZero+numberOfNonZero1)==N){
+						for (j=1; j<=N; j++){
+							for (int l=1; l<=N; l++){
+								if(array[i][j] == array[k+1][l] && array[i][j] != 0){
+									invalid = 1;
+									break;
+								}
+							}
+							if(invalid) break;
+						}
+						if(!invalid){
+							for (j=1; j<=N; j++){
+								S1[numberOfSolutions][j] = array[i][j];
+								S2[numberOfSolutions][j] = array[k+1][j];
+							}
+							numberOfSolutions++;
+						} 
+					}
+					k+=1;
+				}
+			}
+			printf("\nS = {");
+			for(i=0; i<N; i++){
+				if(i == N-1){
+					printf("%d}\n", S[i]);
+				}else printf("%d, ", S[i]);	
+			}
+
+			printf("Partitionings (%d solutions):\n", numberOfSolutions);
+
+			for(i=0; i<numberOfSolutions; i++){
+				printf("{");
+				for(j=1; j<N; j++){
+					if(S1[i][j+1] == 0){ 
+						printf("%d}", S1[i][j]);
+						break;
+					}
+					else printf("%d, ", S1[i][j]);
+				}
+				
+				printf("  {");
+				for(j=1; j<N; j++){
+					if(S2[i][j+1] == 0){ 
+						printf("%d}\n", S2[i][j]);
+						break;
+					}
+					else printf("%d, ", S2[i][j]);
+				}
+			}
+			break;
+		}
+
 		if(nopts[move]>0) {
 			move++;
 			nopts[move]=0; //initialize new move
@@ -57,13 +128,13 @@ void backtrack(int N){
 				counter+=1;
 			}
 			if(move == 1) {
-				for(candidate = arr_size-1; candidate >=0; candidate--) {
+				for(candidate = N-1; candidate >=0; candidate--) {
 					option[move][++nopts[move]] = S[candidate];
 					// printf("nopts[move] %i candidate %i:\n", nopts[move], S[candidate]);           
 				}
 			}
 			else {
-				for(candidate = arr_size-1; candidate>=0; candidate--) {
+				for(candidate = N-1; candidate>=0; candidate--) {
 					for(i=move-1;i>=1;i--)
 						if(S[candidate]==option[i][nopts[i]]) break;
 					if(!(i>=1)) option[move][++nopts[move]] = S[candidate]; 
@@ -75,84 +146,35 @@ void backtrack(int N){
 			move--;
 			nopts[move]--;
 		}
-	}
-
-	int sum = 0;
-	int sum1 = 0;
-
-	int numberOfNonZero = 0;
-	int numberOfNonZero1 = 0;
-	int k;
-	int numberOfSolutions = 0;
-
-	for(i=1; i<=x; i++){
-		k=i;
-		while(k < x){
-			sum = 0;
-			sum1 = 0;
-			numberOfNonZero = 0;
-			numberOfNonZero1 = 0;
-			for (int j=1; j<=arr_size; j++){
-				if(array[i][j] != 0) numberOfNonZero++;
-				if(array[k+1][j] != 0) numberOfNonZero1++;
-				sum += array[i][j];
-				sum1 += array[k+1][j];
-			}
-
-			int invalid = 0;
-			if(sum == sum1 && (numberOfNonZero+numberOfNonZero1)==arr_size){
-				for (int j=1; j<=arr_size; j++){
-					for (int l=1; l<=arr_size; l++){
-						if(array[i][j] == array[k+1][l] && array[i][j] != 0){
-							invalid = 1;
-							break;
-						}
-					}
-					if(invalid) break;
-				}
-				if(!invalid){
-					for (int j=1; j<=arr_size; j++){
-						S1[numberOfSolutions][j] = array[i][j];
-						S2[numberOfSolutions][j] = array[k+1][j];
-					}
-					numberOfSolutions++;
-				} 
-			}
-			k+=1;
-		}
-	}
-	printf("\nS = {");
-	for(i=0; i<arr_size; i++){
-		if(i == arr_size-1){
-			printf("%d}\n", S[i]);
-		}else printf("%d, ", S[i]);	
-	}
-
-	printf("Partitionings (%d solutions):\n", numberOfSolutions);
-
-	for(i=0; i<numberOfSolutions; i++){
-		printf("{");
-		for(int j=1; j<arr_size; j++){
-			if(S1[i][j+1] == 0){ 
-				printf("%d}", S1[i][j]);
-			 	break;
-			}
-			else printf("%d, ", S1[i][j]);
-		}
-		
-		printf("  {");
-		for(int j=1; j<arr_size; j++){
-			if(S2[i][j+1] == 0){ 
-				printf("%d}\n", S2[i][j]);
-			 	break;
-			}
-			else printf("%d, ", S2[i][j]);
-		}
-	}
-		
+	}		
 }
 
 int main(){
-    printf("Hello World!\n");
-    backtrack(8);
+	int numOfSets, n, i, j;
+	int numOfSetsC = 0;
+	int S[10];
+	char line[MAX_LINE_LENGTH];
+
+	FILE *fp;
+	fp = fopen("input.txt", "r");
+	
+	fgets(line, MAX_LINE_LENGTH, fp);
+	numOfSets = atoi(line);
+
+	for(i=0; i<numOfSets;i++){
+		n=0;
+		fgets(line, MAX_LINE_LENGTH, fp);
+
+		char *ptr = strtok(line, " ");
+		while(ptr != NULL){
+			S[n]=atoi(ptr);
+			ptr = strtok(NULL, " ");
+			n++;
+		}
+
+    	backtrack(S, n);
+		printf("\n");
+	}
+
+	return 0;
 }
